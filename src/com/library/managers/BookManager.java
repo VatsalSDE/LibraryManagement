@@ -5,9 +5,9 @@ import com.library.enums.Category;
 import com.library.enums.BookStatus;
 import com.library.exceptions.BookNotFoundException;
 import com.library.exceptions.InvalidBookException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
+
+import java.io.*;
+import java.util.*;
 
 public class BookManager {
     private HashMap<String, Book> books;
@@ -88,6 +88,14 @@ public class BookManager {
         return bookList;
     }
 
+    public Set<String> getAllAuthors() {
+        Set<String> authors = new HashSet<>();
+        for (Book book : books.values()) {
+            authors.add(book.getAuthor());
+        }
+        return authors;
+    }
+
     public List<Book> getAllBooks() {
         return new ArrayList<>(books.values());
     }
@@ -101,5 +109,46 @@ public class BookManager {
     public void markAsAvailable(String bookId) throws BookNotFoundException {
         Book book = getBookById(bookId);
         book.setBookStatus(BookStatus.AVAILABLE);
+    }
+
+
+    // here we will do the like add to the file
+    public void saveToFile(String filename) throws IOException {
+        FileWriter fw = new FileWriter(filename);
+        for (Book book : books.values()) {
+            String line = book.getBookId() + "," + book.getIsbn() + ","
+                    + book.getTitle() + "," + book.getAuthor() + ","
+                    + book.getCategory() + "," + book.getBookStatus();
+            fw.write(line + "\n");
+        }
+        fw.close();
+        System.out.println("Books saved to " + filename);
+    }
+
+    public void loadFromFile(String filename) throws IOException {
+        File file = new File(filename);
+        if (!file.exists()) {
+            System.out.println("No existing books file found. Starting fresh.");
+            return;
+        }
+
+        BufferedReader br = new BufferedReader(new FileReader(filename));
+        String line;
+        while ((line = br.readLine()) != null) {
+            String[] parts = line.split(",");
+            if (parts.length < 6) continue;
+
+            String bookId = parts[0];
+            String isbn = parts[1];
+            String title = parts[2];
+            String author = parts[3];
+            Category category = Category.valueOf(parts[4]);
+            BookStatus status = BookStatus.valueOf(parts[5]);
+
+            Book book = new Book(isbn, title, author, category, status);
+            books.put(bookId, book);
+        }
+        br.close();
+        System.out.println("Books loaded from " + filename);
     }
 }
