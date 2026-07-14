@@ -20,9 +20,12 @@ public class Book implements Comparable<Book> {
 
     private BookStatus bookStatus;
 
-    public Book(String isbn, String title, String author, Category category, BookStatus bookStatus) {
 
-        this.bookID = "B" + dynamicbookId++;
+
+    // now this constructor is added for when the text loaded from the file to the collection at the time of loading so the book id needs to be the same so that's why the reason is that
+    public Book(String bookId, String isbn, String title, String author, Category category, BookStatus bookStatus) {
+
+        this.bookID = bookId;
 
         this.isbn = isbn;
 
@@ -33,6 +36,26 @@ public class Book implements Comparable<Book> {
         this.category = category;
 
         this.bookStatus = bookStatus;
+
+        // Update counter to avoid duplicates
+        if (bookId.startsWith("B")) {
+
+            int id = Integer.parseInt(bookId.substring(1));
+
+            if (id >= dynamicbookId) {
+
+                dynamicbookId = id + 1;
+
+            }
+
+        }
+
+    }
+
+    // constructor chaining here this constructir will be used when like new book to be added
+    public Book(String isbn, String title, String author, Category category, BookStatus bookStatus) {
+
+        this("B" + dynamicbookId++, isbn, title, author, category, bookStatus);
 
     }
 

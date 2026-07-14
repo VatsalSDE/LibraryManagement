@@ -14,11 +14,10 @@ public class Member {
 
     private double dueAmount;
 
-    // Constructor
+    // now this constructor is added for when the text loaded from the file to the collection at the time of loading so the member id needs to be the same so that's why the reason is that
+    public Member(String memberId, String name, String email, String phoneNumber, double dueAmount) {
 
-    public Member(String name, String email, String phoneNumber) {
-
-        this.memberId = "M" + dynamicMemberIdCounter++;
+        this.memberId = memberId;
 
         this.name = name;
 
@@ -26,7 +25,26 @@ public class Member {
 
         this.phoneNumber = phoneNumber;
 
-        dueAmount = 0;
+        this.dueAmount = dueAmount;
+
+        if (memberId.startsWith("M")) {
+
+            int id = Integer.parseInt(memberId.substring(1));
+
+            if (id >= dynamicMemberIdCounter) {
+
+                dynamicMemberIdCounter = id + 1;
+
+            }
+
+        }
+
+    }
+
+    // constructor chaining here this constructor will be used when like new book to be added
+    public Member(String name, String email, String phoneNumber) {
+
+        this("M" + dynamicMemberIdCounter++, name, email, phoneNumber, 0);
 
     }
 

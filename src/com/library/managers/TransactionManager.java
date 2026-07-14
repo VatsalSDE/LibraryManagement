@@ -120,7 +120,7 @@ public class TransactionManager {
 
     }
 
-    public void undoLastTransaction() throws BookNotFoundException, MemberNotFoundException, InvalidFineException {
+    public synchronized void undoLastTransaction() throws BookNotFoundException, MemberNotFoundException, InvalidFineException {
 
         if (undoStack.isEmpty()) {
 
@@ -132,34 +132,42 @@ public class TransactionManager {
 
         Transaction transaction = undoStack.pop();
 
-        // Remove from transactions ArrayList
-
-        transactions.remove(transaction);
-
-        // If return transaction (has returnDate), reverse it
+        // Check transaction type BEFORE removing
 
         if (transaction.getReturnDate() != null) {
+
+            double fine = transaction.getFineAmount();
 
             transaction.setReturnDate(null);
 
             transaction.setFineAmount(0);
 
-            // If fine was added, remove it from member
 
-            if (transaction.getFineAmount() > 0) {
+            if (fine > 0) {
 
                 Member member = memberManager.getMemberById(transaction.getMemberId());
 
-                member.setDueAmount(member.getDueAmount() - transaction.getFineAmount());
+                member.setDueAmount(member.getDueAmount() - fine);
 
             }
 
+            //It WAS a return, so mark book as ISSUED again
+            bookManager.markAsIssued(transaction.getBookId());
+
+            System.out.println("Return undone. Book marked ISSUED again.");
+
+        } else {
+
+            //It WAS an issue, so mark book as AVAILABLE
+
+            bookManager.markAsAvailable(transaction.getBookId());
+
+            System.out.println("Issue undone. Book marked AVAILABLE.");
+
         }
 
-        // Mark book as available again
 
-        bookManager.markAsAvailable(transaction.getBookId());
-
+        transactions.remove(transaction);
     }
 
     private double calculateFine(String dueDate, String returnDate) {
@@ -244,7 +252,7 @@ public class TransactionManager {
 
             double fineAmount = Double.parseDouble(parts[6]);
 
-            Transaction transaction = new Transaction(bookId, memberId, issueDate);
+            Transaction transaction = new Transaction(transactionId , bookId, memberId, issueDate); // so this is for like the from the file so like we get the data as it is no change in the id too
 
             if (returnDate != null) {
 

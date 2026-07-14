@@ -192,9 +192,7 @@ public class MemberManager {
 
             double dueAmount = Double.parseDouble(parts[4]);
 
-            Member member = new Member(name, email, phoneNumber);
-
-            member.setDueAmount(dueAmount);
+            Member member = new Member(memberId , name, email, phoneNumber , dueAmount);
 
             members.put(memberId, member);
 

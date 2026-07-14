@@ -22,9 +22,11 @@ public class Transaction {
 
     private double fineAmount;
 
-    public Transaction(String bookId, String memberId, String issueDate) {
 
-        this.transactionId = "T" + dynamicTransactionIdCounter++;
+    // now this constructor is added for when the text loaded from the file to the collection at the time of loading so the transaction id needs to be the same so that's why the reason is that
+    public Transaction(String transactionId , String bookId, String memberId, String issueDate) {
+
+        this.transactionId = transactionId;
 
         this.bookId = bookId;
 
@@ -37,6 +39,14 @@ public class Transaction {
         this.returnDate = null;
 
         this.fineAmount = 0;
+
+    }
+
+    // this is the constructor for the like the new transactions
+
+    public Transaction(String bookId, String memberId, String issueDate){
+
+        this("T" + dynamicTransactionIdCounter++, bookId , memberId , issueDate);
 
     }
 

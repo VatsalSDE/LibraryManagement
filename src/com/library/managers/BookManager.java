@@ -230,7 +230,7 @@ public class BookManager {
 
             BookStatus status = BookStatus.valueOf(parts[5]);
 
-            Book book = new Book(isbn, title, author, category, status);
+            Book book = new Book(bookId, isbn, title, author, category, status);  // this will be given to the constructor that is with the book id so liek the id will not be changed likewise
 
             books.put(bookId, book);
 
