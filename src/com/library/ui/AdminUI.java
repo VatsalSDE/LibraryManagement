@@ -20,6 +20,8 @@ import com.library.exceptions.*;
 
 import com.library.utilities.InputHandler;
 
+import java.time.format.DateTimeParseException;
+
 import java.util.List;
 
 import java.util.Set;
@@ -208,6 +210,16 @@ public class AdminUI {
 
         try {
 
+            Book book = bookManager.getBookById(bookId);
+
+            if (book.getBookStatus() == BookStatus.ISSUED || transactionManager.hasActiveTransactionForBook(bookId)) {
+
+                System.out.println("Error: Cannot remove a book that is currently issued.");
+
+                return;
+
+            }
+
             bookManager.removeBook(bookId);
 
             System.out.println("Book removed successfully!");
@@ -236,29 +248,39 @@ public class AdminUI {
 
         List<Book> results = null;
 
-        switch (choice) {
+        try {
 
-            case 1:
+            switch (choice) {
 
-                System.out.print("Enter Title: ");
+                case 1:
 
-                results = bookManager.searchByTitle(InputHandler.getStringInput());
+                    System.out.print("Enter Title: ");
 
-                break;
+                    results = bookManager.searchByTitle(InputHandler.getStringInput());
 
-            case 2:
+                    break;
 
-                System.out.print("Enter Author: ");
+                case 2:
 
-                results = bookManager.searchByAuthor(InputHandler.getStringInput());
+                    System.out.print("Enter Author: ");
 
-                break;
+                    results = bookManager.searchByAuthor(InputHandler.getStringInput());
 
-            case 3:
+                    break;
 
-                results = bookManager.searchByCategory(InputHandler.getCategoryInput());
+                case 3:
 
-                break;
+                    results = bookManager.searchByCategory(InputHandler.getCategoryInput());
+
+                    break;
+
+            }
+
+        } catch (IllegalArgumentException e) {
+
+            System.out.println("Error: " + e.getMessage());
+
+            return;
 
         }
 
@@ -340,6 +362,24 @@ public class AdminUI {
 
         try {
 
+            Member member = memberManager.getMemberById(memberId);
+
+            if (member.getDueAmount() > 0) {
+
+                System.out.println("Error: Cannot remove member with pending dues.");
+
+                return;
+
+            }
+
+            if (transactionManager.hasActiveTransactionForMember(memberId)) {
+
+                System.out.println("Error: Cannot remove member with active borrowed books.");
+
+                return;
+
+            }
+
             memberManager.removeMember(memberId);
 
             System.out.println("Member removed successfully!");
@@ -398,6 +438,10 @@ public class AdminUI {
 
             System.out.println("Error: " + e.getMessage());
 
+        } catch (DateTimeParseException e) {
+
+            System.out.println("Error: Invalid date format. Use dd-MM-yyyy.");
+
         }
 
     }
@@ -435,6 +479,10 @@ public class AdminUI {
         } catch (BookNotFoundException | MemberNotFoundException | InvalidFineException e) {
 
             System.out.println("Error: " + e.getMessage());
+
+        } catch (DateTimeParseException e) {
+
+            System.out.println("Error: Invalid date format. Use dd-MM-yyyy.");
 
         }
 

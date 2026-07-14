@@ -8,6 +8,8 @@ import com.library.exceptions.MemberNotFoundException;
 
 import com.library.exceptions.InvalidMemberException;
 
+import com.library.utilities.CsvUtils;
+
 import java.io.*;
 
 import java.util.HashMap;
@@ -144,11 +146,9 @@ public class MemberManager {
 
         for (Member member : members.values()) {
 
-            String line = member.getMemberId() + "," + member.getName() + ","
+            String line = CsvUtils.toCsvLine(member.getMemberId(), member.getName(), member.getEmail(),
 
-                    + member.getEmail() + "," + member.getPhoneNumber() + ","
-
-                    + member.getDueAmount();
+                    member.getPhoneNumber(), String.valueOf(member.getDueAmount()));
 
             fw.write(line + "\n");
 
@@ -178,19 +178,19 @@ public class MemberManager {
 
         while ((line = br.readLine()) != null) {
 
-            String[] parts = line.split(",");
+            List<String> parts = CsvUtils.parseLine(line);
 
-            if (parts.length < 5) continue;
+            if (parts.size() < 5) continue;
 
-            String memberId = parts[0];
+            String memberId = parts.get(0);
 
-            String name = parts[1];
+            String name = parts.get(1);
 
-            String email = parts[2];
+            String email = parts.get(2);
 
-            String phoneNumber = parts[3];
+            String phoneNumber = parts.get(3);
 
-            double dueAmount = Double.parseDouble(parts[4]);
+            double dueAmount = Double.parseDouble(parts.get(4));
 
             Member member = new Member(memberId , name, email, phoneNumber , dueAmount);
 

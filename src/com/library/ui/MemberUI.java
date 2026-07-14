@@ -18,6 +18,8 @@ import com.library.exceptions.*;
 
 import com.library.utilities.InputHandler;
 
+import java.time.format.DateTimeParseException;
+
 import java.util.List;
 
 public class MemberUI {
@@ -126,29 +128,39 @@ public class MemberUI {
 
         List<Book> results = null;
 
-        switch (choice) {
+        try {
 
-            case 1:
+            switch (choice) {
 
-                System.out.print("Enter Title: ");
+                case 1:
 
-                results = bookManager.searchByTitle(InputHandler.getStringInput());
+                    System.out.print("Enter Title: ");
 
-                break;
+                    results = bookManager.searchByTitle(InputHandler.getStringInput());
 
-            case 2:
+                    break;
 
-                System.out.print("Enter Author: ");
+                case 2:
 
-                results = bookManager.searchByAuthor(InputHandler.getStringInput());
+                    System.out.print("Enter Author: ");
 
-                break;
+                    results = bookManager.searchByAuthor(InputHandler.getStringInput());
 
-            case 3:
+                    break;
 
-                results = bookManager.searchByCategory(InputHandler.getCategoryInput());
+                case 3:
 
-                break;
+                    results = bookManager.searchByCategory(InputHandler.getCategoryInput());
+
+                    break;
+
+            }
+
+        } catch (IllegalArgumentException e) {
+
+            System.out.println("Error: " + e.getMessage());
+
+            return;
 
         }
 
@@ -216,6 +228,10 @@ public class MemberUI {
 
             System.out.println("Error: " + e.getMessage());
 
+        } catch (DateTimeParseException e) {
+
+            System.out.println("Error: Invalid date format. Use dd-MM-yyyy.");
+
         }
 
     }
@@ -253,6 +269,10 @@ public class MemberUI {
         } catch (BookNotFoundException | MemberNotFoundException | InvalidFineException e) {
 
             System.out.println("Error: " + e.getMessage());
+
+        } catch (DateTimeParseException e) {
+
+            System.out.println("Error: Invalid date format. Use dd-MM-yyyy.");
 
         }
 
@@ -297,6 +317,8 @@ public class MemberUI {
         String memberId = InputHandler.getStringInput();
 
         try {
+
+            memberManager.getMemberById(memberId);
 
             List<Transaction> transactions = transactionManager.getTransactionsByMember(memberId);
 

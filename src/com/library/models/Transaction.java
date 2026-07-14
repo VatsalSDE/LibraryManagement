@@ -40,6 +40,26 @@ public class Transaction {
 
         this.fineAmount = 0;
 
+        if (transactionId.startsWith("T")) {
+
+            try {
+
+                int id = Integer.parseInt(transactionId.substring(1));
+
+                if (id >= dynamicTransactionIdCounter) {
+
+                    dynamicTransactionIdCounter = id + 1;
+
+                }
+
+            } catch (NumberFormatException e) {
+
+                // Keep the counter unchanged for non-standard transaction IDs.
+
+            }
+
+        }
+
     }
 
     // this is the constructor for the like the new transactions

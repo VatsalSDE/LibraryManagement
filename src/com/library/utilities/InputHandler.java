@@ -44,8 +44,13 @@ public class InputHandler {
 
         int choice = getIntInput();
 
-        return Category.values()[choice - 1];
+        if (choice < 1 || choice > Category.values().length) {
 
+            throw new IllegalArgumentException("Invalid category selected");
+
+        }
+
+        return Category.values()[choice - 1];
     }
 
     public static void closeScanner() {

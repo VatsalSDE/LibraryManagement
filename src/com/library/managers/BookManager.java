@@ -10,6 +10,8 @@ import com.library.exceptions.BookNotFoundException;
 
 import com.library.exceptions.InvalidBookException;
 
+import com.library.utilities.CsvUtils;
+
 import java.io.*;
 
 import java.util.*;
@@ -161,7 +163,6 @@ public class BookManager {
         book.setBookStatus(BookStatus.ISSUED);  // change status
 
         // HashMap already stores reference, so it updates automatically
-
     }
 
     public void markAsAvailable(String bookId) throws BookNotFoundException {
@@ -180,11 +181,9 @@ public class BookManager {
 
         for (Book book : books.values()) {
 
-            String line = book.getBookId() + "," + book.getIsbn() + ","
+            String line = CsvUtils.toCsvLine(book.getBookId(), book.getIsbn(), book.getTitle(),
 
-                    + book.getTitle() + "," + book.getAuthor() + ","
-
-                    + book.getCategory() + "," + book.getBookStatus();
+                    book.getAuthor(), book.getCategory().toString(), book.getBookStatus().toString());
 
             fw.write(line + "\n");
 
@@ -214,21 +213,21 @@ public class BookManager {
 
         while ((line = br.readLine()) != null) {
 
-            String[] parts = line.split(",");
+            List<String> parts = CsvUtils.parseLine(line);
 
-            if (parts.length < 6) continue;
+            if (parts.size() < 6) continue;
 
-            String bookId = parts[0];
+            String bookId = parts.get(0);
 
-            String isbn = parts[1];
+            String isbn = parts.get(1);
 
-            String title = parts[2];
+            String title = parts.get(2);
 
-            String author = parts[3];
+            String author = parts.get(3);
 
-            Category category = Category.valueOf(parts[4]);
+            Category category = Category.valueOf(parts.get(4));
 
-            BookStatus status = BookStatus.valueOf(parts[5]);
+            BookStatus status = BookStatus.valueOf(parts.get(5));
 
             Book book = new Book(bookId, isbn, title, author, category, status);  // this will be given to the constructor that is with the book id so liek the id will not be changed likewise
 

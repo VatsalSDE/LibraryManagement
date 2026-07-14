@@ -10,6 +10,8 @@ import com.library.exceptions.MemberNotFoundException;
 
 import com.library.exceptions.InvalidFineException;
 
+import com.library.utilities.CsvUtils;
+
 import java.io.*;
 
 import java.time.LocalDate;
@@ -120,6 +122,36 @@ public class TransactionManager {
 
     }
 
+    public boolean hasActiveTransactionForBook(String bookId) {
+
+        for (Transaction transaction : transactions) {
+
+            if (transaction.getBookId().equals(bookId) && transaction.getReturnDate() == null) {
+
+                return true;
+
+            }
+
+        }
+
+        return false;
+    }
+
+    public boolean hasActiveTransactionForMember(String memberId) {
+
+        for (Transaction transaction : transactions) {
+
+            if (transaction.getMemberId().equals(memberId) && transaction.getReturnDate() == null) {
+
+                return true;
+
+            }
+
+        }
+
+        return false;
+    }
+
     public synchronized void undoLastTransaction() throws BookNotFoundException, MemberNotFoundException, InvalidFineException {
 
         if (undoStack.isEmpty()) {
@@ -162,12 +194,11 @@ public class TransactionManager {
 
             bookManager.markAsAvailable(transaction.getBookId());
 
+            transactions.remove(transaction);
+
             System.out.println("Issue undone. Book marked AVAILABLE.");
 
         }
-
-
-        transactions.remove(transaction);
     }
 
     private double calculateFine(String dueDate, String returnDate) {
@@ -196,15 +227,13 @@ public class TransactionManager {
 
         for (Transaction transaction : transactions) {
 
-            String line = transaction.getTransactionId() + "," + transaction.getBookId() + ","
+            String line = CsvUtils.toCsvLine(transaction.getTransactionId(), transaction.getBookId(),
 
-                    + transaction.getMemberId() + "," + transaction.getIssueDate() + ","
+                    transaction.getMemberId(), transaction.getIssueDate(), transaction.getDueDate(),
 
-                    + transaction.getDueDate() + "," +
+                    transaction.getReturnDate() != null ? transaction.getReturnDate() : "null",
 
-                    (transaction.getReturnDate() != null ? transaction.getReturnDate() : "null") + ","
-
-                    + transaction.getFineAmount();
+                    String.valueOf(transaction.getFineAmount()));
 
             fw.write(line + "\n");
 
@@ -234,23 +263,23 @@ public class TransactionManager {
 
         while ((line = br.readLine()) != null) {
 
-            String[] parts = line.split(",");
+            List<String> parts = CsvUtils.parseLine(line);
 
-            if (parts.length < 7) continue;
+            if (parts.size() < 7) continue;
 
-            String transactionId = parts[0];
+            String transactionId = parts.get(0);
 
-            String bookId = parts[1];
+            String bookId = parts.get(1);
 
-            String memberId = parts[2];
+            String memberId = parts.get(2);
 
-            String issueDate = parts[3];
+            String issueDate = parts.get(3);
 
-            String dueDate = parts[4];
+            String dueDate = parts.get(4);
 
-            String returnDate = parts[5].equals("null") ? null : parts[5];
+            String returnDate = parts.get(5).equals("null") ? null : parts.get(5);
 
-            double fineAmount = Double.parseDouble(parts[6]);
+            double fineAmount = Double.parseDouble(parts.get(6));
 
             Transaction transaction = new Transaction(transactionId , bookId, memberId, issueDate); // so this is for like the from the file so like we get the data as it is no change in the id too
 
