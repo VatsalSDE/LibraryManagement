@@ -8,6 +8,10 @@ import com.library.managers.MemberManager;
 
 import com.library.managers.TransactionManager;
 
+import com.library.client.LibraryClient;
+
+import com.library.server.LibraryServer;
+
 import com.library.ui.MainUI;
 
 import java.io.IOException;
@@ -15,6 +19,27 @@ import java.io.IOException;
 public class Main {
 
     public static void main(String[] args) {
+
+        if (args.length > 0 && "server".equalsIgnoreCase(args[0])) {
+
+            runServer();
+
+            return;
+
+        }
+
+        if (args.length > 0 && "client".equalsIgnoreCase(args[0])) {
+
+            runClient();
+
+            return;
+
+        }
+
+        runConsoleApp();
+    }
+
+    private static void runConsoleApp() {
 
         BookManager bookManager = new BookManager();
 
@@ -57,6 +82,38 @@ public class Main {
         } catch (IOException e) {
 
             System.out.println("Error: " + e.getMessage());
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+    private static void runServer() {
+
+        try {
+
+            new LibraryServer(5050).start();
+
+        } catch (IOException e) {
+
+            System.out.println("Server error: " + e.getMessage());
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+    private static void runClient() {
+
+        try {
+
+            new LibraryClient("localhost", 5050).start();
+
+        } catch (IOException e) {
+
+            System.out.println("Client error: " + e.getMessage());
 
             e.printStackTrace();
 

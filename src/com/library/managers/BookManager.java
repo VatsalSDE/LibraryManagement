@@ -16,13 +16,16 @@ import java.io.*;
 
 import java.util.*;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 public class BookManager {
 
-    private HashMap<String, Book> books;
+    // Shared across client-handler threads on the server.
+    private ConcurrentHashMap<String, Book> books;
 
     public BookManager() {
 
-        this.books = new HashMap<>();
+        this.books = new ConcurrentHashMap<>();
 
     }
 

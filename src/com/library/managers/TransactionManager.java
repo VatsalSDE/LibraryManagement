@@ -20,15 +20,17 @@ import java.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 
-import java.util.Stack;
-
 import java.util.List;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class TransactionManager {
 
-    private ArrayList<Transaction> transactions;
+    // Shared across client-handler threads on the server.
+    private CopyOnWriteArrayList<Transaction> transactions;
 
-    private Stack<Transaction> undoStack;
+    private Deque<Transaction> undoStack;
 
     private MemberManager memberManager;
 
@@ -36,9 +38,9 @@ public class TransactionManager {
 
     public TransactionManager(MemberManager memberManager, BookManager bookManager) {
 
-        this.transactions = new ArrayList<>();
+        this.transactions = new CopyOnWriteArrayList<>();
 
-        this.undoStack = new Stack<>();
+        this.undoStack = new ConcurrentLinkedDeque<>();
 
         this.memberManager = memberManager;
 
@@ -173,7 +175,6 @@ public class TransactionManager {
             transaction.setReturnDate(null);
 
             transaction.setFineAmount(0);
-
 
             if (fine > 0) {
 

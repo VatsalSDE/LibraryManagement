@@ -12,19 +12,19 @@ import com.library.utilities.CsvUtils;
 
 import java.io.*;
 
-import java.util.HashMap;
-
 import java.util.List;
 
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MemberManager {
 
-    private HashMap<String, Member> members;
+    // Shared across client-handler threads on the server.
+    private ConcurrentHashMap<String, Member> members;
 
     public MemberManager() {
 
-        this.members = new HashMap<>();
+        this.members = new ConcurrentHashMap<>();
 
     }
 

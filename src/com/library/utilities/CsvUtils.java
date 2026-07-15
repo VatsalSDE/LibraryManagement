@@ -63,6 +63,7 @@ public class CsvUtils {
         return values;
     }
 
+    // this method is for the like if the string value already has the comma then like do enclose it in the double inverted commas likewise
     private static String escape(String value) {
 
         if (value == null) {
